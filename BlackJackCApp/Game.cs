@@ -7,130 +7,142 @@ namespace BlackJackCApp
 {
     public class Game
     {
-        Deck deck;
-        Player player;
-        Croupier croupier;
+        private Deck _deck;
+        private Player _player;
+        private Croupier _croupier;
+
+        public event ContentEventHandler MessageShowed;
 
         public Game(){ }
 
         public void NewGame()
         {
-            Console.Write("Enter your Name: ");
-            player = new Player()
+            MessageShowed?.Invoke("Enter your name:");
+            _player = new Player()
             {
                 Name = Console.ReadLine()
             };
-            croupier = new Croupier();
-            deck = new Deck();
+            _croupier = new Croupier();
+            _deck = new Deck();
             Console.Clear();
-            Console.WriteLine($"The game is created. Hi! {player.Name}\n");
+            MessageShowed?.Invoke($"The game is created. Hi! {_player.Name}\n");
+            Play();
         }
 
-        public void OnPlay()
+        private void Play()
         {
-            if(deck.CountCardsInDeck() < 25)
+            if(_deck.CountCardsInDeck() < 25)
             {
-                deck.OnCreate();
+                _deck.CreateDeck();
             }
+
+            _player.Hand.Add(_deck.GetCard());
+            _croupier.Hand.Add(_deck.GetCard());
+            _player.Hand.Add(_deck.GetCard());
+            _croupier.Hand.Add(_deck.GetCard());
 
             int num = 0;
-            bool insurance = false;
-            int playerTotal = 0;
-            int croupierTotal = 0;
-            bool play = true;
-
-            player.Hand.Add(deck.GetCard());
-            croupier.Hand.Add(deck.GetCard());
-            player.Hand.Add(deck.GetCard());
-            croupier.Hand.Add(deck.GetCard());
-
-            Console.WriteLine($"{player.Name}'s hand:");
-            foreach (var c in player.Hand)
+            MessageShowed?.Invoke($"{_player.Name}'s hand:");
+            foreach (var c in _player.Hand)
             {
-                Console.WriteLine($"Card {++num}: {c.Name} of {c.Suit}");
+                MessageShowed?.Invoke($"Card {++num}: {c.Name} of {c.Suit}");
             }
-            Console.WriteLine("Total: {0}\n", CalcPlayerHand());
+            MessageShowed?.Invoke($"Total: {CalcPlayerHand()}\n");
 
-            Console.WriteLine("Croupier's hand:");
-            Console.WriteLine("Card 1: {0} of {1}", croupier.Hand[0].Name, croupier.Hand[0].Suit);
-            Console.WriteLine("Card 2: [Hidden Card]");
-            Console.WriteLine("Total: {0}\n", croupier.Hand[0].Dignity);
+            MessageShowed?.Invoke("Croupier's hand:");
+            MessageShowed?.Invoke($"Card 1: {_croupier.Hand[0].Name} of {_croupier.Hand[0].Suit}");
+            MessageShowed?.Invoke("Card 2: [Hidden Card]");
+            MessageShowed?.Invoke($"Total: {_croupier.Hand[0].Dignity}\n");
 
-            //Check Ace in Croupier's hand. Insurance stage!
-            if (croupier.Hand[0].Name == Name.Ace)
+            bool insurance = CanInsure();
+            bool add_on = HaveBlackJack(insurance);
+
+            AddonCard(add_on);
+        }
+
+        public void Continue()
+        {
+            MessageShowed?.Invoke("\nDo you want to continue or quit? [A]ccept / [Q]uit");
+            ConsoleKeyInfo command = Console.ReadKey(true);
+            while (command.Key != ConsoleKey.A && command.Key != ConsoleKey.Q)
             {
-                Console.WriteLine("Insurance? ([Y]es / [N]o)");
-                ConsoleKeyInfo command = Console.ReadKey(true);
-                while (command.Key != ConsoleKey.Y && command.Key != ConsoleKey.N)
-                {
-                    Console.WriteLine("Croupier has an Ace. Insurance from Croupier's Black Jack? [Y] / [N]");
-                    command = Console.ReadKey(true);
-                }
-                if (command.Key == ConsoleKey.Y)
-                {
-                    insurance = true;
-                    Console.WriteLine("\nInsurance Accepted!\n");
-                }
-                else
-                {
-                    insurance = false;
-                    Console.WriteLine("\nInsurance Rejected.\n");
-                }
+                MessageShowed?.Invoke("Continue? [A] / [Q]");
+                command = Console.ReadKey(true);
             }
-
-            if(croupier.Hand[0].Name == Name.Ace || croupier.Hand[0].Dignity == 10)
+            if (command.Key == ConsoleKey.A)
             {
-                Console.WriteLine("Croupier is checking Hand for the BlackJack...\n");
+                _player.Hand.Clear();
+                _croupier.Hand.Clear();
+                MessageShowed?.Invoke("\nPlease, wait! The croupier gives new cards...\n");
+                System.Threading.Thread.Sleep(3000);
+                Play();
+            }
+            else { MessageShowed?.Invoke("\n---------------Game Over---------------\n"); }
+        }
+
+        private bool HaveBlackJack(bool insurance)
+        {
+            bool add_on = true;
+            if (_croupier.Hand[0].Name == Name.Ace || _croupier.Hand[0].Dignity == 10)
+            {
+                MessageShowed?.Invoke("Croupier is checking Hand for the BlackJack...\n");
                 System.Threading.Thread.Sleep(2000);
-                int total = croupier.Hand[0].Dignity + croupier.Hand[1].Dignity;
+                int total = _croupier.Hand[0].Dignity + _croupier.Hand[1].Dignity;
 
                 if (total == 21)
                 {
-                    Console.WriteLine("Croupier's hand:");
-                    Console.WriteLine("Card 1: {0} of {1}", croupier.Hand[0].Name, croupier.Hand[0].Suit);
-                    Console.WriteLine("Card 2: {0} of {1}", croupier.Hand[1].Name, croupier.Hand[1].Suit);
-                    Console.WriteLine("Total: {0} - BlackJack!\n", total);
+                    MessageShowed?.Invoke("Croupier's hand:");
+                    MessageShowed?.Invoke($"Card 1: {_croupier.Hand[0].Name} of {_croupier.Hand[0].Suit}");
+                    MessageShowed?.Invoke($"Card 2: {_croupier.Hand[1].Name} of {_croupier.Hand[1].Suit}");
+                    MessageShowed?.Invoke($"Total: {total} - BlackJack!\n");
 
-                    if (player.Hand[0].Dignity + player.Hand[1].Dignity == 21 && insurance)
+                    if (_player.Hand[0].Dignity + _player.Hand[1].Dignity == 21 && insurance)
                     {
-                        Console.WriteLine($"{player.Name}, You have - BlackJack! Prize pool: 1 to 1");
+                        MessageShowed?.Invoke($"{_player.Name}, You have - BlackJack! Prize pool: 1 to 1");
                     }
-                    else if (player.Hand[0].Dignity + player.Hand[1].Dignity != 21 && !insurance)
+                    if (_player.Hand[0].Dignity + _player.Hand[1].Dignity != 21 && !insurance)
                     {
-                        Console.WriteLine($"{player.Name} Lost! The casino takes your bet. \n");
+                        MessageShowed?.Invoke($"{_player.Name} Lost! The casino takes your bet. \n");
                     }
                     Continue();
                 }
             }
-
             if (CalcPlayerHand() == 21)
             {
-                Console.WriteLine("BlackJack, You Won! Prize pool: 3 to 2");
-                Console.WriteLine($"Croupier has: {CalcCroupierHand()} points");
+                MessageShowed?.Invoke($"BlackJack, You Won! Croupier has: {CalcCroupierHand()} points. Prize pool: 3 to 2");
+                add_on = false;
                 Continue();
-                play = false;
             }
+            return add_on;
+        }
 
-            // [Hit] the card if player says "Hit Me"
-            while(play)
+        /// <summary>
+        /// [Hit] the card if player says "Hit Me"
+        /// </summary>
+        /// <param name="add_on">true, if need add-on</param>
+        private void AddonCard(bool add_on)
+        {
+            int playerTotal = 0;
+            int croupierTotal = 0;
+            while (add_on)
             {
-                Console.WriteLine("Do you want add-on card or enough? : [E]nough or [H]it\n");
+                MessageShowed?.Invoke("Do you want add-on card or enough? : [E]nough or [H]it\n");
                 ConsoleKeyInfo keyInfo = Console.ReadKey(true);
                 while (keyInfo.Key != ConsoleKey.H && keyInfo.Key != ConsoleKey.E)
                 {
-                    Console.WriteLine("Illegal key. Need to tap [S] or [H]\n");
+                    MessageShowed?.Invoke("Illegal key. Need to tap [S] or [H]\n");
                     keyInfo = Console.ReadKey(true);
                 }
 
                 switch (keyInfo.Key)
                 {
                     case ConsoleKey.H:
-                        Console.WriteLine("-----[Hit]-----");
-                        player.HitMe(deck.GetCard());
-                        Console.WriteLine($"{player.Name}'s hand:");
-                        Console.WriteLine("Hitted card: {0} of {1}", player.Hand.Last().Name, player.Hand.Last().Suit);
+                        _player.HitMe(_deck.GetCard());
 
-                        if (player.Hand.Last().Name == Name.Ace)
+                        MessageShowed?.Invoke($"[---Hit---]\n{_player.Name}'s hand:");
+                        MessageShowed?.Invoke($"Hitted card: {_player.Hand.Last().Name} of {_player.Hand.Last().Suit}");
+
+                        if (_player.Hand.Last().Name == Name.Ace)
                         {
                             playerTotal = CalcPlayerHand();
                             if (playerTotal > 21)
@@ -143,54 +155,52 @@ namespace BlackJackCApp
                         {
                             playerTotal = CalcPlayerHand();
                         }
-                        Console.WriteLine("Total now: {0}\n", playerTotal);
-                        if(playerTotal > 21)
+                        MessageShowed?.Invoke($"Total now: {playerTotal}\n");
+                        if (playerTotal > 21)
                         {
-                            Console.WriteLine("A lot of! You Lose. The casino takes your bet.");
-                            play = false;
+                            MessageShowed?.Invoke("A lot of! You Lose. The casino takes your bet.");
+                            add_on = false;
                         }
-                        else if(playerTotal == 21)
+                        if(playerTotal == 21)
                         {
-                            Console.WriteLine("BlackJack! I assume you want to stand from now on...\n");
+                            MessageShowed?.Invoke("BlackJack! I assume you want to stand from now on...\n");
                             System.Threading.Thread.Sleep(1000);
                             continue;
                         }
-                        else { continue; }
-                        break;
+                        continue;
 
                     case ConsoleKey.E:
-                        Console.WriteLine("---[Enough]---, Croupier cheks his hand...");
-                        Console.WriteLine("Croupier's hand:");
-                        Console.WriteLine("Card 1: {0} of {1}", croupier.Hand[0].Name, croupier.Hand[0].Suit);
-                        Console.WriteLine("Card 2: {0} of {1}", croupier.Hand[1].Name, croupier.Hand[1].Suit);
+                        MessageShowed?.Invoke("[---Enough---]\nCroupier cheks his hand...");
+                        MessageShowed?.Invoke($"Card 1: {_croupier.Hand[0].Name} of {_croupier.Hand[0].Suit}");
+                        MessageShowed?.Invoke($"Card 2: {_croupier.Hand[1].Name} of {_croupier.Hand[1].Suit}");
 
                         croupierTotal = CalcCroupierHand();
 
                         while (croupierTotal < 17)
                         {
-                            croupier.Hand.Add(deck.GetCard());
-                            Console.WriteLine("Hitted card: {0} of {1}", croupier.Hand.Last().Name, croupier.Hand.Last().Suit);
+                            _croupier.Hand.Add(_deck.GetCard());
+                            MessageShowed?.Invoke($"Hitted card: {_croupier.Hand.Last().Name} of {_croupier.Hand.Last().Suit}");
                             croupierTotal = CalcCroupierHand();
                         }
-                        Console.WriteLine("Total now: {0}\n", croupierTotal);
+                        MessageShowed?.Invoke($"Total now: {croupierTotal}\n");
 
                         if (croupierTotal > 21)
                         {
-                            Console.WriteLine("Croupier bust:( You win! Prize pool = 3 to 2");
-                            play = false;
+                            MessageShowed?.Invoke("Croupier bust. You win! Prize pool = 3 to 2");
+                            add_on = false;
                         }
                         else
                         {
                             playerTotal = CalcPlayerHand();
                             if (croupierTotal > playerTotal)
                             {
-                                Console.WriteLine("Croupier wins! {0} vs {1}", croupierTotal, playerTotal);
+                                MessageShowed?.Invoke($"Croupier wins! {croupierTotal} vs {playerTotal}");
                             }
                             else
                             {
-                                Console.WriteLine($"{player.Name} wins! Croupier: {croupierTotal} vs You: {playerTotal}");
+                                MessageShowed?.Invoke($"{_player.Name} wins! Croupier: {croupierTotal} vs You: {playerTotal}");
                             }
-                            play = false;
+                            add_on = false;
                         }
                         break;
                 }
@@ -198,33 +208,34 @@ namespace BlackJackCApp
             Continue();
         }
 
-        public void Continue()
+        private bool CanInsure()
         {
-            Console.WriteLine("\nWant to play [A]gain or [Q]uit?");
-            ConsoleKeyInfo command = Console.ReadKey(true);
-            while (command.Key != ConsoleKey.A && command.Key != ConsoleKey.Q)
+            //Check Ace in Croupier's hand. Insurance stage!
+            bool insurance = false;
+
+            if (_croupier.Hand[0].Name == Name.Ace)
             {
-                Console.WriteLine("Continue? [A] / [Q]");
-                command = Console.ReadKey(true);
+                MessageShowed?.Invoke("Insurance? ([Y]es / [N]o)");
+                ConsoleKeyInfo command = Console.ReadKey(true);
+                while (command.Key != ConsoleKey.Y && command.Key != ConsoleKey.N)
+                {
+                    MessageShowed?.Invoke("Croupier has an Ace. Insurance from Croupier's Black Jack? [Y] / [N]");
+                    command = Console.ReadKey(true);
+                }
+                if (command.Key == ConsoleKey.Y)
+                {
+                    insurance = true;
+                    MessageShowed?.Invoke("\nInsurance Accepted!\n");
+                }
+                else { MessageShowed?.Invoke("\nInsurance Rejected.\n"); }
             }
-            if (command.Key == ConsoleKey.A)
-            {
-                player.Hand.Clear();
-                croupier.Hand.Clear();
-                Console.WriteLine("\nPlease, wait! The croupier gives new cards...\n");
-                System.Threading.Thread.Sleep(3000);
-                OnPlay();
-            }
-            else
-            {
-                Console.WriteLine("\n---------------Game Over---------------\n");
-            }
+            return insurance;
         }
 
         private int CalcPlayerHand()
         {
             int sum = 0;
-            foreach(var card in player.Hand)
+            foreach(var card in _player.Hand)
             {
                 sum += card.Dignity;
             }
@@ -233,7 +244,7 @@ namespace BlackJackCApp
         private int CalcCroupierHand()
         {
             int sum = 0;
-            foreach (var card in croupier.Hand)
+            foreach (var card in _croupier.Hand)
             {
                 sum += card.Dignity;
             }

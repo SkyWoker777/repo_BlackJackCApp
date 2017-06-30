@@ -8,34 +8,43 @@ namespace BlackJackCApp
 {
     public class Deck
     {
-        private List<Card> cards;
+        private List<Card> _cards;
 
         public Deck()
         {
-            OnCreate();
+            CreateDeck();
         }
        
-        public void OnCreate()
+        public void CreateDeck()
         {
-            cards = new List<Card>();
+            _cards = new List<Card>();
+            var numOfSuit = Enum.GetNames(typeof(Suit)).Length;
+            var cardsSameSuit = Enum.GetNames(typeof(Name)).Length;
+            int dignityAce = 11;
+            int dignityPicture = 10;
 
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i < numOfSuit; i++)
             {
-                for (int j = 0; j < 13; j++)
+                for (int j = 0; j < cardsSameSuit; j++)
                 {
-                    cards.Add(new Card() { 
+                    _cards.Add(new Card() { 
                         Name = (Name)j,
                         Suit = (Suit)i
                     });
 
                     if (j <= 7)
-                        cards[cards.Count - 1].Dignity = j + 2;
-                    else if(j == 12)
                     {
-                        cards[cards.Count - 1].Dignity = 11;
+                        _cards[_cards.Count - 1].Dignity = j + 2;
                     }
-                    else
-                        cards[cards.Count - 1].Dignity = 10;
+                    if (j == 12)
+                    {
+
+                        _cards[_cards.Count - 1].Dignity = dignityAce;
+                    }
+                    if (j >= 8 && j != 12)
+                    {
+                        _cards[_cards.Count - 1].Dignity = dignityPicture;
+                    }
                 }
             }
             Shuffle();
@@ -43,30 +52,29 @@ namespace BlackJackCApp
 
         public Card GetCard()
         {
-            Card card = cards.First();
-            cards.Remove(card);
+            Card card = _cards.First();
+            _cards.Remove(card);
             return card;
         }
 
         public int CountCardsInDeck()
         {
-            return cards.Count;
+            return _cards.Count;
         }
 
         private void Shuffle()
         {
             Random rnd = new Random();
-            int n = cards.Count;
+            int n = _cards.Count;
             while (n > 1)
             {
                 n--;
                 int k = rnd.Next(n + 1);
-                Card card = cards[k];
-                cards[k] = cards[n];
-                cards[n] = card;
+                Card card = _cards[k];
+                _cards[k] = _cards[n];
+                _cards[n] = card;
             }
         }
-
 
     }
 }

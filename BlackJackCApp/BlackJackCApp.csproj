@@ -42,7 +42,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Application.cs" />
     <Compile Include="Card.cs" />
+    <Compile Include="ContentMessage.cs" />
     <Compile Include="Croupier.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="Program.cs" />
