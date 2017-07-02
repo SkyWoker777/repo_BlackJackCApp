@@ -10,6 +10,7 @@ namespace BlackJackCApp
         private Deck _deck;
         private User _user;
         private Croupier _croupier;
+        private int _remaining = 25;
         public const int BLACKJACK = 21;
         public const int MINVALUE = 17;
 
@@ -28,7 +29,7 @@ namespace BlackJackCApp
         {
             _user.Hand.Clear();
             _croupier.Hand.Clear();
-            if (_deck.Count < 25)
+            if (_deck.Count < _remaining)
             {
                 _deck.CreateDeck();
             }
@@ -91,7 +92,7 @@ namespace BlackJackCApp
                 total = CalcHand(hand);
                 if (total > BLACKJACK)
                 {
-                    // Now a card Ace = 1
+                    // Now the dignity of Ace is 1
                     hand.Last().Dignity = 1;
                 }
             }
