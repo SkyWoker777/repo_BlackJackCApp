@@ -18,32 +18,27 @@ namespace BlackJackCApp
         public void CreateDeck()
         {
             _cards = new List<Card>();
-            var numOfSuit = Enum.GetNames(typeof(Suit)).Length;
-            var cardsSameSuit = Enum.GetNames(typeof(Name)).Length;
-            int dignityAce = 11;
-            int dignityPicture = 10;
 
-            for (int i = 0; i < numOfSuit; i++)
+            for (int i = 0; i < Enum.GetNames(typeof(Suit)).Length; i++)
             {
-                for (int j = 0; j < cardsSameSuit; j++)
+                for (int j = 0, value = 2; j < Enum.GetNames(typeof(Name)).Length; j++)
                 {
-                    _cards.Add(new Card() { 
-                        Name = (Name)j,
-                        Suit = (Suit)i
-                    });
+                    var card = new Card();
+                    card.Name = (Name)j;
+                    card.Suit = (Suit)i;
+                    _cards.Add(card);
 
-                    if (j <= 7)
+                    if (j < (int)Name.Ten)
                     {
-                        _cards[_cards.Count - 1].Dignity = j + 2;
+                        _cards.Last().Dignity = value++;
                     }
-                    if (j == 12)
+                    if (j == (int)Name.Ace)
                     {
-
-                        _cards[_cards.Count - 1].Dignity = dignityAce;
+                        _cards.Last().Dignity = ++value;
                     }
-                    if (j >= 8 && j != 12)
+                    if (j >= (int)Name.Ten && j != (int)Name.Ace)
                     {
-                        _cards[_cards.Count - 1].Dignity = dignityPicture;
+                        _cards.Last().Dignity = value;
                     }
                 }
             }
@@ -57,9 +52,21 @@ namespace BlackJackCApp
             return card;
         }
 
-        public int CountCardsInDeck()
+        public void DisplayDeck()
         {
-            return _cards.Count;
+            if (_cards.Count == 0)
+            {
+                CreateDeck();
+            }
+            foreach (var c in _cards)
+            {
+                Console.WriteLine($"{c.Name} of {c.Suit} : {c.Dignity}");
+            }
+        }
+
+        public int Count
+        {
+            get { return _cards.Count; }
         }
 
         private void Shuffle()
@@ -69,7 +76,7 @@ namespace BlackJackCApp
             while (n > 1)
             {
                 n--;
-                int k = rnd.Next(n + 1);
+                int k = rnd.Next(n+1);
                 Card card = _cards[k];
                 _cards[k] = _cards[n];
                 _cards[n] = card;

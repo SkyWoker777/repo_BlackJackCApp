@@ -8,15 +8,11 @@ namespace BlackJackCApp
 {
     public class Application
     {
-        public event ContentEventHandler Launched;
-
         public void Run()
         {
-            Launched("Welcome to BlackJack!\n");
-
-            Game game = new Game();
-            game.MessageShowed += ContentMessage.Show_Message;
+            var game = new GameViewModel();
             game.NewGame();
+            game.Play();
         }
     }
 }

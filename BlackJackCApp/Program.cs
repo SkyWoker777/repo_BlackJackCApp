@@ -11,7 +11,6 @@ namespace BlackJackCApp
         static void Main(string[] args)
         {
             Application app = new Application();
-            app.Launched += ContentMessage.Show_Message;
             app.Run();
         }
 
