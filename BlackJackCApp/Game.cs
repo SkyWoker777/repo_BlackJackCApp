@@ -22,9 +22,6 @@ namespace BlackJackCApp
             _deck = new Deck();
         }
 
-        /// <summary>
-        /// Fills hands for early game
-        /// </summary>
         public void Initialize()
         {
             _user.Hand.Clear();
@@ -49,10 +46,6 @@ namespace BlackJackCApp
             return _croupier.Hand;
         }
 
-        /// <summary>
-        /// Returns false if player has no BLACKJACK
-        /// </summary>
-        /// <param name="hand"></param>
         public bool HaveBlackJack(List<Card> hand)
         {
             int total = CalcHand(hand);
@@ -69,18 +62,11 @@ namespace BlackJackCApp
             return sum;
         }
 
-        /// <summary>
-        /// Checks an ace in dealer's hands
-        /// </summary>
-        /// <returns>Returns false if dealer has no an Ace</returns>
         public bool HaveAnAce()
         {
             return (_croupier.Hand[0].Name == Name.Ace) ? true : false;
         }
 
-        /// <summary>
-        /// [Hit] the card in player's hand
-        /// </summary>
         public void TakeACard(List<Card> hand)
         {
             int total = 0;
@@ -91,7 +77,6 @@ namespace BlackJackCApp
                 total = CalcHand(hand);
                 if (total > BLACKJACK)
                 {
-                    // Now the dignity of Ace is 1
                     hand.Last().Dignity = 1;
                 }
             }

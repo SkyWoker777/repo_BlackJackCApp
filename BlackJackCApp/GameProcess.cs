@@ -24,6 +24,7 @@ namespace BlackJackCApp
             var user_hand = _game.GetUserHand();
             int userTotal = _game.CalcHand(user_hand);
             ContentControl.ShowHand(_userName, user_hand, userTotal);
+            System.Threading.Thread.Sleep(1000);
 
             var croupier_hand = _game.GetCroupierHand();
             int croupierTotal = _game.CalcHand(croupier_hand);
@@ -33,7 +34,7 @@ namespace BlackJackCApp
             bool add_on = true;
             if (croupier_hand[0].Name == Name.Ace || croupier_hand[0].Dignity == 10)
             {
-                ContentControl.ShowMessage("The croupier is checking Hand for the BlackJack...");
+                ContentControl.ShowView_Cheking();
                 bool have_croupier = _game.HaveBlackJack(croupier_hand);
                 System.Threading.Thread.Sleep(2000);
 
@@ -134,8 +135,7 @@ namespace BlackJackCApp
                 }
                 if (userTotal == Game.BLACKJACK)
                 {
-                    ContentControl.ShowMessage("BlackJack! I assume you want to stand from now on...\n");
-                    System.Threading.Thread.Sleep(1000);
+                    ContentControl.ShowView_Offering();
                     continue;
                 }
                 continue;

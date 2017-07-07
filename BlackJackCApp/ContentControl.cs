@@ -40,6 +40,14 @@ namespace BlackJackCApp
             ShowMessage("Croupier bust. You win! Prize pool = 3 to 2");
         }
 
+        public static void ShowView_Cheking()
+        {
+            ShowMessage("The croupier is checking Hand for the BlackJack...");
+        }
+        public static void ShowView_Offering()
+        {
+            ShowMessage("BlackJack! I assume you want to stand from now on...\n");
+        }
 
         public static void ShowHittedCard(string playerName, List<Card> hand, int total)
         {
@@ -48,13 +56,6 @@ namespace BlackJackCApp
             ShowMessage($"Total now: {total}\n");
         }
 
-        /// <summary>
-        /// Shows a hand with a player's cards.
-        /// </summary>
-        /// <param name="playerName"></param>
-        /// <param name="hand"></param>
-        /// <param name="total">value of hand</param>
-        /// <param name="hidden">Hides one of dealer cards in an early game.</param>
         public static void ShowHand(string playerName, List<Card> hand, int total , bool hidden = false)
         {
             if (!hidden)
@@ -106,9 +107,7 @@ namespace BlackJackCApp
                 ShowMessage("\nInsurance Accepted!\n");
                 return true;
             }
-            if(command.Key == ConsoleKey.N) {
-                ShowMessage("\nInsurance Rejected.\n");
-            }
+            ShowMessage("\nInsurance Rejected.\n");
             return false;
         }
         public static bool SuggestTakeACard()
