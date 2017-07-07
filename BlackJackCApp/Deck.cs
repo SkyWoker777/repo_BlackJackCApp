@@ -18,7 +18,7 @@ namespace BlackJackCApp
         public void CreateDeck()
         {
             _cards = new List<Card>();
-            int minCardValue = 2;
+            int minCardValue;
 
             for (int i = 0; i < Enum.GetNames(typeof(Suit)).Length; i++)
             {
