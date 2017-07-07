@@ -18,10 +18,12 @@ namespace BlackJackCApp
         public void CreateDeck()
         {
             _cards = new List<Card>();
+            int _valueOfCard = 2;
 
             for (int i = 0; i < Enum.GetNames(typeof(Suit)).Length; i++)
             {
-                for (int j = 0, value = 2; j < Enum.GetNames(typeof(Name)).Length; j++)
+                _valueOfCard = 2;
+                for (int j = 0; j < Enum.GetNames(typeof(Name)).Length; j++)
                 {
                     var card = new Card();
                     card.Name = (Name)j;
@@ -30,15 +32,15 @@ namespace BlackJackCApp
 
                     if (j < (int)Name.Ten)
                     {
-                        _cards.Last().Dignity = value++;
+                        _cards.Last().Dignity = _valueOfCard++;
                     }
                     if (j == (int)Name.Ace)
                     {
-                        _cards.Last().Dignity = ++value;
+                        _cards.Last().Dignity = ++_valueOfCard;
                     }
                     if (j >= (int)Name.Ten && j != (int)Name.Ace)
                     {
-                        _cards.Last().Dignity = value;
+                        _cards.Last().Dignity = _valueOfCard;
                     }
                 }
             }
@@ -60,7 +62,7 @@ namespace BlackJackCApp
             }
             foreach (var c in _cards)
             {
-                Console.WriteLine($"{c.Name} of {c.Suit} : {c.Dignity}");
+                ContentControl.ShowMessage($"{c.Name} of {c.Suit} : {c.Dignity}");
             }
         }
 

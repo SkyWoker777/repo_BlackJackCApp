@@ -40,14 +40,13 @@ namespace BlackJackCApp
             _croupier.Hand.Add(_deck.GetCard());
         }
 
-        /// <summary>
-        /// Returns the user's hand if the player is true. Else returns the croupier's hand.
-        /// </summary>
-        /// <param name="player"></param>
-        public List<Card> GetHand(bool player)
+        public List<Card> GetUserHand()
         {
-            List<Card> hand = (player) ? _user.Hand : _croupier.Hand;
-            return hand;
+            return _user.Hand;
+        }
+        public List<Card> GetCroupierHand()
+        {
+            return _croupier.Hand;
         }
 
         /// <summary>

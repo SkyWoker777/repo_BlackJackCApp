@@ -10,9 +10,9 @@ namespace BlackJackCApp
     {
         static void Main(string[] args)
         {
-            Application app = new Application();
-            app.Run();
+            var game = new GameProcess();
+            game.NewGame();
+            game.Play();
         }
-
     }
 }
